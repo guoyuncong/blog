@@ -5,6 +5,12 @@ import com.blog.platform.model.param.CategoryParam;
 
 import java.util.List;
 
+/**
+ * 分类 Service
+ *
+ * @author: rookie
+ * @date: 2020-10-10
+ */
 public interface CategoryService {
 
     /**
@@ -33,9 +39,8 @@ public interface CategoryService {
      * 查询分类列表
      *
      * @param name     分类名称
-     * @param parentId 父级ID
      * @param level    等级
      * @return List<Category>
      */
-    List<CategoryDTO> list(String name, String parentId, String level);
+    List<CategoryDTO> list(String name, Integer level);
 }

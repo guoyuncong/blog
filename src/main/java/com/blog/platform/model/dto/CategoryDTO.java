@@ -1,5 +1,6 @@
 package com.blog.platform.model.dto;
 
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -7,11 +8,12 @@ import lombok.ToString;
 import java.io.Serializable;
 
 /**
- * 分类表
+ * 分类
+ *
+ * @author: rookie
+ * @date: 2020-10-10
  */
-@Getter
-@Setter
-@ToString
+@Data
 public class CategoryDTO extends EntityDTO implements Serializable {
 
     private static final long serialVersionUID = 1L;

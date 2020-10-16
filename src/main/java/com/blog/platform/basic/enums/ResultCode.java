@@ -127,9 +127,10 @@ public enum ResultCode {
     BIZ_SYSTEM_CATEGORY_ERROR("B0400", "分类异常"),
     BIZ_SYSTEM_CATEGORY_NAME_HAS_EXIST("B0401", "分类名称已存在"),
     BIZ_SYSTEM_CATEGORY_PARENT_NOT_EXIST("B0402", "父级分类不存在"),
-    BIZ_SYSTEM_CATEGORY_NOT_EXIST("B0403", "本分类不存在"),
+    BIZ_SYSTEM_CATEGORY_NOT_EXIST("B0403", "分类不存在"),
     BIZ_SYSTEM_CATEGORY_HAS_CHILD("B0404", "存在子级分类，不允许删除"),
     BIZ_SYSTEM_CATEGORY_DISTRIBUTE("B0405", "分类已被分配，不允许删除"),
+
 
     BIZ_SYSTEM_LABEL_ERROR("B0500", "标签异常"),
     BIZ_SYSTEM_LABEL_NAME_HAS_EXIST("B0501", "标签名称已存在"),
@@ -141,6 +142,7 @@ public enum ResultCode {
     BIZ_SYSTEM_LINK_ERROR("B0500", "链接异常"),
     BIZ_SYSTEM_LINK_NAME_HAS_EXIST("B0501", "链接名称已存在"),
     BIZ_SYSTEM_LINK_NOT_EXIST("B0502", "本链接不存在"),
+
 
     /**
      * 三方服务模块

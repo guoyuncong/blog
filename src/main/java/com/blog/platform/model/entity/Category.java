@@ -1,17 +1,16 @@
 package com.blog.platform.model.entity;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.Data;
 
 import java.io.Serializable;
 
 /**
- * 分类表
+ * 分类
+ *
+ * @author: rookie
+ * @date: 2020-10-10
  */
-@Getter
-@Setter
-@ToString
+@Data
 public class Category extends Entity implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -29,7 +28,7 @@ public class Category extends Entity implements Serializable {
     /**
      * 类别等级
      */
-    private String level;
+    private Integer level;
 
     /**
      * 父类别id

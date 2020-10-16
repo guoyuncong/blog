@@ -2,11 +2,13 @@ package com.blog.platform.model.param;
 
 import lombok.Data;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.*;
 
 /**
- * 权限请求参数
+ * 分类请求参数
+ *
+ * @author: rookie
+ * @date: 2020-10-10
  */
 @Data
 public class CategoryParam {
@@ -23,20 +25,20 @@ public class CategoryParam {
     private String name;
 
     /**
-     * 等级
-     */
-    @NotBlank(message = "等级不能为空")
-    private String level;
-
-    /**
      * 排序
      */
-    @NotBlank(message = "排序不能为空")
-    @Size(max = 99, message = "排序值限定不能超过100")
+    @NotNull(message = "排序不能为空")
+    @Max(value = 100)
+    @Min(value = 0)
     private Integer sort;
 
     /**
      * 父级ID
      */
     private String parentId;
+
+    /**
+     * 分类等级
+     */
+    private Integer level;
 }

@@ -7,7 +7,6 @@ import com.blog.platform.model.dto.ResultDTO;
 import com.blog.platform.model.param.CategoryParam;
 import com.blog.platform.service.CategoryService;
 import lombok.AllArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,12 +32,12 @@ public class CategoryController {
      * @param categoryParam 分类参数
      * @return 结果
      */
-    @PostMapping("save")
+    @PostMapping
     @Log(module = "分类管理", businessType = BusinessType.SAVE)
     @PreAuthorize("@permissionCheckService.hasPermission('system:category:save')")
-    public ResponseEntity<?> save(@RequestBody @Valid CategoryParam categoryParam) {
+    public ResultDTO<String> save(@RequestBody @Valid CategoryParam categoryParam) {
         String id = categoryService.save(categoryParam);
-        return ResponseEntity.ok(ResultDTO.ofSuccess(id));
+        return ResultDTO.ofSuccess(id);
     }
 
     /**
@@ -47,12 +46,12 @@ public class CategoryController {
      * @param categoryParam 分类参数
      * @return 结果
      */
-    @PutMapping("update")
+    @PutMapping
     @Log(module = "分类管理", businessType = BusinessType.UPDATE)
     @PreAuthorize("@permissionCheckService.hasPermission('system:category:update')")
-    public ResponseEntity<?> update(@RequestBody @Valid CategoryParam categoryParam) {
+    public ResultDTO<?> update(@RequestBody @Valid CategoryParam categoryParam) {
         categoryService.update(categoryParam);
-        return ResponseEntity.ok(ResultDTO.ofSuccess());
+        return ResultDTO.ofSuccess();
     }
 
     /**
@@ -61,12 +60,12 @@ public class CategoryController {
      * @param categoryId 分类ID
      * @return 结果
      */
-    @DeleteMapping("/{categoryId}")
+    @DeleteMapping("{categoryId}")
     @Log(module = "分类管理", businessType = BusinessType.DELETE)
-    @PreAuthorize("@permissionCheckService.checkPermission('system:category:delete')")
-    public ResponseEntity<?> delete(@PathVariable String categoryId) {
+    @PreAuthorize("@permissionCheckService.hasPermission('system:category:delete')")
+    public ResultDTO<?> delete(@PathVariable String categoryId) {
         categoryService.delete(categoryId);
-        return ResponseEntity.ok(ResultDTO.ofSuccess());
+        return ResultDTO.ofSuccess();
     }
 
     /**
@@ -80,10 +79,9 @@ public class CategoryController {
     @GetMapping("list")
     @Log(module = "分类管理", businessType = BusinessType.QUERY)
     @PreAuthorize("@permissionCheckService.hasPermission('system:category:query')")
-    public ResponseEntity<?> list(@RequestParam(required = false) String name,
-                                  @RequestParam(required = false) String parentId,
-                                  @RequestParam(required = false) String level) {
-        List<CategoryDTO> categoryDTOS = categoryService.list(name, parentId, level);
-        return ResponseEntity.ok(ResultDTO.ofSuccess(categoryDTOS));
+    public ResultDTO<List<CategoryDTO>> list(@RequestParam(required = false) String name,
+                                             @RequestParam(required = false) Integer level) {
+        List<CategoryDTO> categoryDTOS = categoryService.list(name, level);
+        return ResultDTO.ofSuccess(categoryDTOS);
     }
 }

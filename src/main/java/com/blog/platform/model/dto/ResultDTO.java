@@ -6,7 +6,12 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.ToString;
 
-
+/**
+ * 响应结果
+ *
+ * @author: rookie
+ * @date: 2020-10-10
+ */
 @Getter
 @ToString
 @AllArgsConstructor(access =  AccessLevel.PRIVATE)

@@ -10,6 +10,12 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+/**
+ * 权限核验
+ *
+ * @author: rookie
+ * @date: 2020-10-10
+ */
 @Component
 @AllArgsConstructor
 public class PermissionCheckService {

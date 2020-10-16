@@ -28,7 +28,13 @@ public class Constants {
      */
     public static final String ROLE_ADMIN = "admin";
 
-
+    /**
+     * 等级
+     * 0    父级
+     * 1    子级
+     */
+    public static final Integer LEVEL_PARENT = 0;
+    public static final Integer LEVEL_CHILD = 1;
 
 
 }

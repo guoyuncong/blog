@@ -1,13 +1,13 @@
 package com.blog.platform.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
-import com.blog.platform.basic.enums.RelationLevel;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.blog.platform.basic.constants.Constants;
 import com.blog.platform.basic.enums.ResultCode;
 import com.blog.platform.basic.exception.BizException;
-import com.blog.platform.basic.util.DO2DTOUtil;
 import com.blog.platform.basic.util.SecurityUtil;
+import com.blog.platform.basic.util.converter.CategoryCovert;
 import com.blog.platform.mapper.CategoryMapper;
 import com.blog.platform.mapper.PostCategoryMapper;
 import com.blog.platform.model.dto.CategoryDTO;
@@ -20,6 +20,12 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+/**
+ * 分类 Service-Impl
+ *
+ * @author: rookie
+ * @date: 2020-10-10
+ */
 @Service
 @AllArgsConstructor
 public class CategoryServiceImpl implements CategoryService {
@@ -54,34 +60,44 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public List<CategoryDTO> list(String name, String parentId, String level) {
-//        List<Category> categories = categoryMapper.se(name, parentId, level);
-//        return DO2DTOUtil.categoryList2DTOList(categories);
-        return null;
+    public List<CategoryDTO> list(String name, Integer level) {
+        LambdaQueryWrapper<Category> queryWrapper = new LambdaQueryWrapper<Category>()
+                .eq(Category::getLevel, level)
+                .like(Category::getName, name);
+        List<Category> categories = categoryMapper.selectList(queryWrapper);
+        List<CategoryDTO> categoryDTOS = CategoryCovert.INSTANCE.domain2Dto(categories);
+        return categoryDTOS;
     }
 
     /**
      * 核验删除分类参数
      *
-     * @param categoryId
+     * @param categoryId 分类ID
      */
     private void checkDeleteCategoryParam(String categoryId) {
-       /* Category category = categoryMapper.selectById(categoryId);
+        Category category = categoryMapper.selectById(categoryId);
         if (category == null) {
             throw BizException.of(ResultCode.BIZ_SYSTEM_CATEGORY_NOT_EXIST);
         }
-        String level = category.getLevel();
-        if (RelationLevel.PARENT.equals(level)) {
-            List<Category> categories = categoryMapper.se(category.getId());
-            if (CollUtil.isNotEmpty(categories)) {
+        Integer level = category.getLevel();
+        String id = category.getId();
+        // 有下级不允许删除
+        if (Constants.LEVEL_PARENT.equals(level)) {
+            LambdaQueryWrapper<Category> queryWrapper = new LambdaQueryWrapper<Category>()
+                    .eq(Category::getParentId, id);
+            Integer count = categoryMapper.selectCount(queryWrapper);
+            if (count > 0) {
                 throw BizException.of(ResultCode.BIZ_SYSTEM_CATEGORY_HAS_CHILD);
             }
         } else {
-            List<PostCategory> postsCategories = postsCategoryMapper.getPostCategoryByCategoryId(category.getId());
-            if (CollUtil.isNotEmpty(postsCategories)) {
+            // 存在文章关联不允许删除
+            LambdaQueryWrapper<PostCategory> queryWrapper = new LambdaQueryWrapper<PostCategory>()
+                    .eq(PostCategory::getCategoryId, id);
+            Integer count = postsCategoryMapper.selectCount(queryWrapper);
+            if (count > 0) {
                 throw BizException.of(ResultCode.BIZ_SYSTEM_CATEGORY_DISTRIBUTE);
             }
-        }*/
+        }
     }
 
     /**
@@ -90,16 +106,24 @@ public class CategoryServiceImpl implements CategoryService {
      * @param categoryParam 分类参数
      */
     private void checkUpdateCategoryParam(CategoryParam categoryParam) {
-       /* String id = categoryParam.getId();
+        String id = categoryParam.getId();
         if (StrUtil.isEmpty(id)) {
             throw BizException.of(ResultCode.USER_REQUEST_FILL_PARAM_EMPTY);
         }
+        String parentId = categoryParam.getParentId();
+        if (StrUtil.isNotEmpty(parentId) && id.equals(parentId)) {
+            throw BizException.of(ResultCode.USER_REQUEST_PARAM_ERROR);
+        }
         String name = categoryParam.getName();
-        Category category = categoryMapper.getCategoryByName(name);
-        if (category != null && !category.getId().equals(id)) {
+        LambdaQueryWrapper<Category> queryWrapper = new LambdaQueryWrapper<Category>()
+                .eq(Category::getName, name)
+                .ne(Category::getId, id);
+        Integer count = categoryMapper.selectCount(queryWrapper);
+        if (count > 0) {
             throw BizException.of(ResultCode.BIZ_SYSTEM_CATEGORY_NAME_HAS_EXIST);
         }
-        checkCategoryParentChildRelation(categoryParam);*/
+        // 核验父级
+        checkCategoryParent(categoryParam);
     }
 
     /**
@@ -108,12 +132,14 @@ public class CategoryServiceImpl implements CategoryService {
      * @param categoryParam 分类参数
      */
     private void checkSaveCategoryParam(CategoryParam categoryParam) {
-      /*  String name = categoryParam.getName();
-        Category category = categoryMapper.getCategoryByName(name);
+        String name = categoryParam.getName();
+        LambdaQueryWrapper<Category> queryWrapper = new LambdaQueryWrapper<Category>().eq(Category::getName, name);
+        Category category = categoryMapper.selectOne(queryWrapper);
         if (category != null) {
             throw BizException.of(ResultCode.BIZ_SYSTEM_CATEGORY_NAME_HAS_EXIST);
         }
-        checkCategoryParentChildRelation(categoryParam);*/
+        // 核验父级
+        checkCategoryParent(categoryParam);
     }
 
     /**
@@ -121,18 +147,19 @@ public class CategoryServiceImpl implements CategoryService {
      *
      * @param categoryParam 分类参数
      */
-    private void checkCategoryParentChildRelation(CategoryParam categoryParam) {
-       /* String level = categoryParam.getLevel();
-        // 如果是子级分类，查找父级分类是否存在
-        if (RelationLevel.CHILD.name().equals(level)) {
-            String parentId = categoryParam.getParentId();
-            if (StrUtil.isEmpty(parentId)){
-                throw BizException.of(ResultCode.USER_REQUEST_FILL_PARAM_EMPTY);
-            }
-            Category category = categoryMapper.getCategoryByIdAndLevel(parentId, RelationLevel.PARENT.name());
-            if (category == null) {
+    private void checkCategoryParent(CategoryParam categoryParam) {
+        String parentId = categoryParam.getParentId();
+        if (StrUtil.isNotEmpty(parentId)) {
+            LambdaQueryWrapper<Category> queryWrapper = new LambdaQueryWrapper<Category>()
+                    .eq(Category::getId, parentId)
+                    .eq(Category::getLevel, Constants.LEVEL_PARENT);
+            Integer count = categoryMapper.selectCount(queryWrapper);
+            if (count == 0) {
                 throw BizException.of(ResultCode.BIZ_SYSTEM_CATEGORY_PARENT_NOT_EXIST);
             }
-        }*/
+            categoryParam.setLevel(Constants.LEVEL_CHILD);
+        } else {
+            categoryParam.setLevel(Constants.LEVEL_PARENT);
+        }
     }
 }

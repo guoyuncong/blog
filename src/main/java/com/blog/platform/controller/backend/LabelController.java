@@ -7,7 +7,6 @@ import com.blog.platform.model.dto.ResultDTO;
 import com.blog.platform.model.param.LabelParam;
 import com.blog.platform.service.LabelService;
 import lombok.AllArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,9 +35,9 @@ public class LabelController {
     @PostMapping("save")
     @Log(module = "标签管理", businessType = BusinessType.SAVE)
     @PreAuthorize("@permissionCheckService.hasPermission('system:label:save')")
-    public ResponseEntity<?> save(@RequestBody @Valid LabelParam labelParam) {
+    public ResultDTO<String> save(@RequestBody @Valid LabelParam labelParam) {
         String id = labelService.save(labelParam);
-        return ResponseEntity.ok(ResultDTO.ofSuccess(id));
+        return ResultDTO.ofSuccess(id);
     }
 
     /**
@@ -50,9 +49,9 @@ public class LabelController {
     @PutMapping("update")
     @Log(module = "标签管理", businessType = BusinessType.UPDATE)
     @PreAuthorize("@permissionCheckService.hasPermission('system:label:update')")
-    public ResponseEntity<?> update(@RequestBody @Valid LabelParam labelParam) {
+    public ResultDTO update(@RequestBody @Valid LabelParam labelParam) {
         labelService.update(labelParam);
-        return ResponseEntity.ok(ResultDTO.ofSuccess());
+        return ResultDTO.ofSuccess();
     }
 
     /**
@@ -64,9 +63,9 @@ public class LabelController {
     @DeleteMapping("/{labelId}")
     @Log(module = "标签管理", businessType = BusinessType.DELETE)
     @PreAuthorize("@permissionCheckService.checkPermission('system:label:delete')")
-    public ResponseEntity<?> delete(@PathVariable String labelId) {
+    public ResultDTO delete(@PathVariable String labelId) {
         labelService.delete(labelId);
-        return ResponseEntity.ok(ResultDTO.ofSuccess());
+        return ResultDTO.ofSuccess();
     }
 
     /**
@@ -80,10 +79,10 @@ public class LabelController {
     @GetMapping("list")
     @Log(module = "标签管理", businessType = BusinessType.QUERY)
     @PreAuthorize("@permissionCheckService.hasPermission('system:label:query')")
-    public ResponseEntity<?> list(@RequestParam(required = false) String name,
+    public ResultDTO list(@RequestParam(required = false) String name,
                                   @RequestParam(required = false) String parentId,
                                   @RequestParam(required = false) String level) {
         List<LabelDTO> labelDTOS = labelService.list(name, parentId, level);
-        return ResponseEntity.ok(ResultDTO.ofSuccess(labelDTOS));
+        return ResultDTO.ofSuccess(labelDTOS);
     }
 }

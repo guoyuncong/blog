@@ -65,7 +65,7 @@ public class LinkController {
      */
     @DeleteMapping("/{linkId}")
     @Log(module = "链接管理", businessType = BusinessType.DELETE)
-    @PreAuthorize("@permissionCheckService.checkPermission('system:link:delete')")
+    @PreAuthorize("@permissionCheckService.hasPermission('system:link:delete')")
     public ResponseEntity<?> delete(@PathVariable String linkId) {
         linkService.delete(linkId);
         return ResponseEntity.ok(ResultDTO.ofSuccess());
