@@ -1,5 +1,6 @@
 package com.blog.platform.model.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
@@ -31,15 +32,18 @@ public class CategoryDTO extends EntityDTO implements Serializable {
     /**
      * 类别等级
      */
+    @JsonIgnore
     private String level;
 
     /**
      * 父类别id
      */
+    @JsonIgnore
     private String parentId;
 
     /**
      * 排序
      */
+    @JsonIgnore
     private Integer sort;
 }

@@ -42,7 +42,6 @@ public class EntityDTO {
     /**
      * 创建时间
      */
-    @JsonIgnore
     private Long createDate;
 
     /**

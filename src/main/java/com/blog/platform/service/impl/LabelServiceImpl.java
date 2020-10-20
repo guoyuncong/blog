@@ -1,11 +1,18 @@
 package com.blog.platform.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.StrUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.blog.platform.basic.constants.Constants;
+import com.blog.platform.basic.enums.ResultCode;
+import com.blog.platform.basic.exception.BizException;
 import com.blog.platform.basic.util.SecurityUtil;
 import com.blog.platform.mapper.LabelMapper;
 import com.blog.platform.mapper.PostLabelMapper;
 import com.blog.platform.model.dto.LabelDTO;
+import com.blog.platform.model.entity.Category;
 import com.blog.platform.model.entity.Label;
+import com.blog.platform.model.param.CategoryParam;
 import com.blog.platform.model.param.LabelParam;
 import com.blog.platform.service.LabelService;
 import lombok.AllArgsConstructor;
@@ -83,16 +90,23 @@ public class LabelServiceImpl implements LabelService {
      * @param labelParam 分类参数
      */
     private void checkUpdateLabelParam(LabelParam labelParam) {
-       /* String id = labelParam.getId();
+        String id = labelParam.getId();
         if (StrUtil.isEmpty(id)) {
             throw BizException.of(ResultCode.USER_REQUEST_FILL_PARAM_EMPTY);
         }
+        String parentId = labelParam.getParentId();
+        if (StrUtil.isNotEmpty(parentId) && parentId.equals(id)) {
+            throw BizException.of(ResultCode.USER_REQUEST_PARAM_ERROR);
+        }
         String name = labelParam.getName();
-        Label label = labelMapper.getLabelByName(name);
-        if (label != null && !label.getId().equals(id)) {
+        LambdaQueryWrapper<Label> queryWrapper = new LambdaQueryWrapper<Label>()
+                .eq(Label::getName, name)
+                .ne(Label::getId, id);
+        Integer count = labelMapper.selectCount(queryWrapper);
+        if (count > 0) {
             throw BizException.of(ResultCode.BIZ_SYSTEM_LABEL_NAME_HAS_EXIST);
         }
-        checkLabelParentChildRelation(labelParam);*/
+        checkLabelParent(labelParam);
     }
 
     /**
@@ -101,12 +115,14 @@ public class LabelServiceImpl implements LabelService {
      * @param labelParam 分类参数
      */
     private void checkSaveLabelParam(LabelParam labelParam) {
-      /*  String name = labelParam.getName();
-        Label label = labelMapper.getLabelByName(name);
-        if (label != null) {
+        String name = labelParam.getName();
+        LambdaQueryWrapper<Label> queryWrapper = new LambdaQueryWrapper<Label>()
+                .eq(Label::getName, name);
+        Integer count = labelMapper.selectCount(queryWrapper);
+        if (count > 0) {
             throw BizException.of(ResultCode.BIZ_SYSTEM_LABEL_NAME_HAS_EXIST);
         }
-        checkLabelParentChildRelation(labelParam);*/
+        checkLabelParent(labelParam);
     }
 
     /**
@@ -114,18 +130,19 @@ public class LabelServiceImpl implements LabelService {
      *
      * @param labelParam 分类参数
      */
-    private void checkLabelParentChildRelation(LabelParam labelParam) {
-        /*String level = labelParam.getLevel();
-        // 如果是子级分类，查找父级分类是否存在
-        if (RelationLevel.CHILD.name().equals(level)) {
-            String parentId = labelParam.getParentId();
-            if (StrUtil.isEmpty(parentId)){
-                throw BizException.of(ResultCode.USER_REQUEST_FILL_PARAM_EMPTY);
+    private void checkLabelParent(LabelParam labelParam) {
+        String parentId = labelParam.getParentId();
+        if (StrUtil.isEmpty(parentId)) {
+            labelParam.setLevel(Constants.LEVEL_PARENT);
+        } else {
+            LambdaQueryWrapper<Label> queryWrapper = new LambdaQueryWrapper<Label>()
+                    .eq(Label::getId, parentId)
+                    .eq(Label::getLevel, Constants.LEVEL_PARENT);
+            Integer count = labelMapper.selectCount(queryWrapper);
+            if (count == 0) {
+                throw BizException.of(ResultCode.BIZ_SYSTEM_LABEL_PARENT_NOT_EXIST);
             }
-            Label label = labelMapper.getLabelByIdAndLevel(parentId, RelationLevel.PARENT.name());
-            if (label == null) {
-                throw BizException.of(ResultCode.BIZ_SYSTEM_CATEGORY_PARENT_NOT_EXIST);
-            }
-        }*/
+            labelParam.setLevel(Constants.LEVEL_CHILD);
+        }
     }
 }

@@ -2,11 +2,13 @@ package com.blog.platform.model.param;
 
 import lombok.Data;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.*;
 
 /**
  * 标签请求参数
+ *
+ * @author: rookie
+ * @date: 2020-10-10
  */
 @Data
 public class LabelParam {
@@ -25,14 +27,14 @@ public class LabelParam {
     /**
      * 等级
      */
-    @NotBlank(message = "等级不能为空")
-    private String level;
+    private Integer level;
 
     /**
      * 排序
      */
-    @NotBlank(message = "排序不能为空")
-    @Size(max = 99, message = "排序值限定不能超过100")
+    @NotNull
+    @Min(value = 0, message = "排序数值不能小于0")
+    @Max(value = 100, message = "排序数值不能大于100")
     private Integer sort;
 
     /**

@@ -32,7 +32,7 @@ public class LabelController {
      * @param labelParam 标签参数
      * @return 结果
      */
-    @PostMapping("save")
+    @PostMapping
     @Log(module = "标签管理", businessType = BusinessType.SAVE)
     @PreAuthorize("@permissionCheckService.hasPermission('system:label:save')")
     public ResultDTO<String> save(@RequestBody @Valid LabelParam labelParam) {
@@ -46,10 +46,10 @@ public class LabelController {
      * @param labelParam 标签参数
      * @return 结果
      */
-    @PutMapping("update")
+    @PutMapping
     @Log(module = "标签管理", businessType = BusinessType.UPDATE)
     @PreAuthorize("@permissionCheckService.hasPermission('system:label:update')")
-    public ResultDTO update(@RequestBody @Valid LabelParam labelParam) {
+    public ResultDTO<Void> update(@RequestBody @Valid LabelParam labelParam) {
         labelService.update(labelParam);
         return ResultDTO.ofSuccess();
     }

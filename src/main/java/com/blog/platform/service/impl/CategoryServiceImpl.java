@@ -7,7 +7,7 @@ import com.blog.platform.basic.constants.Constants;
 import com.blog.platform.basic.enums.ResultCode;
 import com.blog.platform.basic.exception.BizException;
 import com.blog.platform.basic.util.SecurityUtil;
-import com.blog.platform.basic.util.converter.CategoryCovert;
+import com.blog.platform.basic.util.converter.CategoryConverter;
 import com.blog.platform.mapper.CategoryMapper;
 import com.blog.platform.mapper.PostCategoryMapper;
 import com.blog.platform.model.dto.CategoryDTO;
@@ -19,6 +19,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * 分类 Service-Impl
@@ -62,10 +63,11 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public List<CategoryDTO> list(String name, Integer level) {
         LambdaQueryWrapper<Category> queryWrapper = new LambdaQueryWrapper<Category>()
-                .eq(Category::getLevel, level)
-                .like(Category::getName, name);
+                .eq(level != null, Category::getLevel, level)
+                .like(StrUtil.isNotEmpty(name), Category::getName, name)
+                .orderByAsc(Category::getSort);
         List<Category> categories = categoryMapper.selectList(queryWrapper);
-        List<CategoryDTO> categoryDTOS = CategoryCovert.INSTANCE.domain2Dto(categories);
+        List<CategoryDTO> categoryDTOS = CategoryConverter.INSTANCE.domain2Dto(categories);
         return categoryDTOS;
     }
 

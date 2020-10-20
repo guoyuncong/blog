@@ -49,7 +49,7 @@ public class CategoryController {
     @PutMapping
     @Log(module = "分类管理", businessType = BusinessType.UPDATE)
     @PreAuthorize("@permissionCheckService.hasPermission('system:category:update')")
-    public ResultDTO<?> update(@RequestBody @Valid CategoryParam categoryParam) {
+    public ResultDTO<Void> update(@RequestBody @Valid CategoryParam categoryParam) {
         categoryService.update(categoryParam);
         return ResultDTO.ofSuccess();
     }
@@ -63,7 +63,7 @@ public class CategoryController {
     @DeleteMapping("{categoryId}")
     @Log(module = "分类管理", businessType = BusinessType.DELETE)
     @PreAuthorize("@permissionCheckService.hasPermission('system:category:delete')")
-    public ResultDTO<?> delete(@PathVariable String categoryId) {
+    public ResultDTO<Void> delete(@PathVariable String categoryId) {
         categoryService.delete(categoryId);
         return ResultDTO.ofSuccess();
     }
@@ -72,7 +72,6 @@ public class CategoryController {
      * 查询分类列表
      *
      * @param name     分类名称
-     * @param parentId 父级ID
      * @param level    等级
      * @return 结果
      */
